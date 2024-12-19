@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Socket.IO</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Tester Socket.IO</h1>
+
+    <!-- Formulaire pour créer une catégorie -->
+    <form id="category-form">
+        <label for="categorie">Nom de la catégorie :</label>
+        <input type="text" id="categorie" name="categorie" required>
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <h2>Résultats :</h2>
+    <div id="results"></div>
+
+    <script>
+        // Connexion au serveur Socket.IO
+        const socket = io("http://localhost:3000"); // Remplacez par l'URL de votre serveur si nécessaire
+
+        // Gestion de l'envoi du formulaire
+        document.getElementById("category-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Récupération de la valeur du champ
+            const categorie = document.getElementById("categorie").value;
+
+            // Émettre un événement au serveur
+            socket.emit("fetch-category-Z", { categorie });
+
+            // Réinitialisation du champ
+            document.getElementById("categorie").value = "";
+        });
+
+        // Réception des données du serveur
+        socket.on("category-Z-data", function (data) {
+            const resultsDiv = document.getElementById("results");
+
+            // Afficher les résultats
+            resultsDiv.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+        });
+
+        // Gestion des erreurs
+        socket.on("error", function (error) {
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "<p style='color: red;'>Erreur : " + error.message + "</p>";
+        });
+    </script>
+</body>
+</html>
